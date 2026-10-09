@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Premier League Standings & Winner Forecaster</title>
+  <meta name="description" content="Minimal Premier League predictor using AIMLite. Forecast final standings, statistics, and champions by season year.">
+  
+  <!-- Modern Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body class="minimal-dark">
+  <div class="app-container">
+    <!-- Clean Minimal Navigation Bar -->
+    <header class="app-header">
+      <div class="header-brand">
+        <img 
+          src="https://crests.football-data.org/PL.png" 
+          alt="Premier League" 
+          class="pl-logo-img"
+          onerror="this.style.display='none'"
+        />
+        <div class="brand-text">
+          <h1 class="brand-title">Premier League Predictor</h1>
+          <p class="brand-subtitle">AIMLite v2.1.2 • Dixon-Coles Poisson Monte Carlo Engine</p>
+        </div>
+      </div>
+
+      <div class="header-meta">
+        <div class="status-chip" id="server-status">
+          <span class="status-dot"></span>
+          <span>Online</span>
+        </div>
+        <button class="ghost-btn" id="info-modal-trigger" title="Model Specifications">
+          <span>Specs</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <!-- Minimal Control Panel -->
+      <section class="control-panel" aria-labelledby="control-heading">
+        <div class="control-top">
+          <div class="control-label-group">
+            <h2 id="control-heading">Season Forecast</h2>
+            <span class="control-hint" id="year-season-hint">2025/26 Season • Supported: 2019 – 2029</span>
+          </div>
+          <span class="sim-badge">500 Simulations</span>
+        </div>
+
+        <div class="input-form-row">
+          <div class="year-input-wrapper">
+            <label for="year-input" class="sr-only">Season Year</label>
+            <div class="year-input-box">
+              <span class="input-prefix">Year (2019–2029)</span>
+              <input 
+                type="number" 
+                id="year-input" 
+                class="year-field" 
+                min="2019" 
+                max="2029" 
+                value="2026" 
+                placeholder="2019 – 2029"
+                autocomplete="off"
+              />
+            </div>
+          </div>
+
+          <button id="predict-btn" class="primary-predict-btn">
+            <span class="btn-spinner hidden" id="btn-spinner"></span>
+            <span class="btn-text">Predict Standings & Winner</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Minimal Winner Showcase (Prominently displays the crowned winner) -->
+      <section class="winner-showcase-section" id="winner-section">
+        <div class="winner-card-body">
+          <div class="winner-left">
+            <div class="winner-crest-wrapper">
+              <img 
+                id="winner-logo" 
+                class="winner-logo-img" 
+                src="https://crests.football-data.org/57.png" 
+                alt="Winner Logo" 
+              />
+              <span class="trophy-tag" title="Premier League Champion">🏆 #1</span>
+            </div>
+
+            <div class="winner-team-details">
+              <span class="winner-tag" id="winner-season-label">2025/26 CHAMPION</span>
+              <h2 class="winner-team-name" id="winner-name">Arsenal</h2>
+              <p class="winner-meta-text">
+                <span id="winner-stadium">Emirates Stadium</span> • Manager: <strong id="winner-manager">Mikel Arteta</strong>
+              </p>
+              <div class="winner-margin-pill" id="winner-margin-badge">
+                <span id="winner-margin-text">+2 PTS clear of runner-up Liverpool</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="winner-stats-grid">
+            <div class="stat-cell primary">
+              <span class="stat-cell-label">POINTS</span>
+              <span class="stat-cell-val" id="winner-points">87</span>
+              <span class="stat-cell-sub">38 Games</span>
+            </div>
+
+            <div class="stat-cell">
+              <span class="stat-cell-label">TITLE PROBABILITY</span>
+              <span class="stat-cell-val" id="winner-prob">49.4%</span>
+              <span class="stat-cell-sub">Monte Carlo</span>
+            </div>
+
+            <div class="stat-cell">
+              <span class="stat-cell-label">RECORD (W-D-L)</span>
+              <span class="stat-cell-val" id="winner-record">27 - 6 - 5</span>
+              <span class="stat-cell-sub">Won / Drawn / Lost</span>
+            </div>
+
+            <div class="stat-cell">
+              <span class="stat-cell-label">GOAL DIFFERENCE</span>
+              <span class="stat-cell-val" id="winner-gd">+59</span>
+              <span class="stat-cell-sub" id="winner-goals">88 GF / 29 GA</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Key Season Insights Grid -->
+      <section class="season-kpi-grid">
+        <div class="kpi-card">
+          <span class="kpi-label">UCL Champions League (Top 4)</span>
+          <span class="kpi-value" id="kpi-ucl">ARS, LIV, MCI, CHE</span>
+          <span class="kpi-sub">Direct qualification</span>
+        </div>
+
+        <div class="kpi-card">
+          <span class="kpi-label">Top Attack</span>
+          <span class="kpi-value" id="kpi-attack">Arsenal</span>
+          <span class="kpi-sub" id="kpi-attack-goals">88 Goals Scored</span>
+        </div>
+
+        <div class="kpi-card">
+          <span class="kpi-label">Best Defense</span>
+          <span class="kpi-value" id="kpi-defense">Arsenal</span>
+          <span class="kpi-sub" id="kpi-defense-goals">29 Goals Conceded</span>
+        </div>
+
+        <div class="kpi-card">
+          <span class="kpi-label">Relegation Zone (18-20)</span>
+          <span class="kpi-value" id="kpi-relegation">LEI, LEE, BUR</span>
+          <span class="kpi-sub">Relegated to Championship</span>
+        </div>
+      </section>
+
+      <!-- Standings Table Section -->
+      <section class="standings-table-section" aria-labelledby="table-heading">
+        <div class="table-header">
+          <div class="table-title-group">
+            <h3 id="table-heading">League Table</h3>
+            <span class="table-season-tag" id="table-season-tag">2025/26 Season</span>
+          </div>
+
+          <div class="table-controls">
+            <div class="filter-group" role="tablist">
+              <button class="filter-btn active" data-filter="all">All 20</button>
+              <button class="filter-btn" data-filter="ucl">UCL (1-4)</button>
+              <button class="filter-btn" data-filter="uel">UEL/UECL (5-6)</button>
+              <button class="filter-btn" data-filter="relegation">Relegation (18-20)</button>
+            </div>
+
+            <div class="table-search">
+              <input type="text" id="team-search" placeholder="Search club..." />
+            </div>
+          </div>
+        </div>
+
+        <!-- Standings Table Container -->
+        <div class="table-container">
+          <table class="standings-table" id="standings-table">
+            <thead>
+              <tr>
+                <th class="th-rank">#</th>
+                <th class="th-club">Club</th>
+                <th class="th-num">P</th>
+                <th class="th-num">W</th>
+                <th class="th-num">D</th>
+                <th class="th-num">L</th>
+                <th class="th-num">GF</th>
+                <th class="th-num">GA</th>
+                <th class="th-num">GD</th>
+                <th class="th-pts">PTS</th>
+                <th class="th-form">Form</th>
+                <th class="th-prob">Title</th>
+                <th class="th-prob">Top 4</th>
+                <th class="th-prob">Drop</th>
+              </tr>
+            </thead>
+            <tbody id="standings-tbody">
+              <!-- Rendered via app.js -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Minimal Legend Bar -->
+        <div class="table-legend-bar">
+          <div class="legend-item">
+            <span class="legend-indicator ucl"></span>
+            <span>1-4 Champions League</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-indicator uel"></span>
+            <span>5 Europa League</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-indicator uecl"></span>
+            <span>6 Conference League</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-indicator rel"></span>
+            <span>18-20 Relegation</span>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Minimal Footer -->
+    <footer class="app-footer">
+      <div class="footer-left">
+        <span>Premier League Forecaster</span>
+        <span class="footer-sep">•</span>
+        <span>Weights: <code>models/premier_league_predictor.pkl</code></span>
+      </div>
+      <div class="footer-right">
+        <span>AIMLite v2.1.2</span>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Minimal Specs Modal -->
+  <div class="modal-overlay hidden" id="info-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Model Specifications</h3>
+        <button class="modal-close-btn" id="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-row">
+          <span>Framework</span>
+          <strong>AIMLite v2.1.2</strong>
+        </div>
+        <div class="modal-row">
+          <span>Algorithm</span>
+          <strong>Dixon-Coles Poisson MLE + Monte Carlo</strong>
+        </div>
+        <div class="modal-row">
+          <span>Historical Training Set</span>
+          <strong>2,660 Fixtures (2018/19 – 2024/25)</strong>
+        </div>
+        <div class="modal-row">
+          <span>Logos API</span>
+          <strong>Open-source football-data.org CDN</strong>
+        </div>
+        <div class="modal-row">
+          <span>Serving Endpoint</span>
+          <code>POST /predict</code>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Minimal Team Drawer -->
+  <div class="drawer-overlay hidden" id="team-drawer">
+    <div class="drawer-card" id="drawer-content">
+      <!-- Populated on row click -->
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

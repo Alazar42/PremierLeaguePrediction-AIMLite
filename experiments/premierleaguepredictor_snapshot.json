@@ -1,0 +1,29 @@
+{
+  "model_name": "PremierLeaguePredictor",
+  "model_class": "PremierLeaguePredictor",
+  "weights_file": "/home/mickycodes/Projects/PythonProjects/AIMLiteProjects/premierleague_prediction/models/premier_league_predictor.pkl",
+  "step": null,
+  "timestamp": 1791511240.8610656,
+  "config": {
+    "name": "premierleague_prediction",
+    "version": "0.1.0",
+    "entrypoint": "premierleague_prediction",
+    "template": "scratch",
+    "clean": true,
+    "dependencies": [
+      "numpy",
+      "scikit-learn"
+    ],
+    "config": {
+      "device": "auto",
+      "batch_size": 32
+    },
+    "paths": {
+      "data": "data",
+      "models": "models",
+      "experiments": "experiments",
+      "artifacts": "artifacts",
+      "checkpoints": "checkpoints"
+    }
+  }
+}
