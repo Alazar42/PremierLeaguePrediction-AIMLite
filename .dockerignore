@@ -1,0 +1,11 @@
+# Ignore host virtual environment and cache files
+.venv
+__pycache__
+*.py[cod]
+*$py.class
+.git
+.gitignore
+.agents
+.env
+.env.*
+*.log
