@@ -6,7 +6,8 @@ ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PIP_NO_CACHE_DIR=1 \
     PORT=8000 \
-    HOST=0.0.0.0
+    HOST=0.0.0.0 \
+    PATH="/app/.venv/bin:$PATH"
 
 # Install system dependencies (curl for healthchecks & network tooling)
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -14,7 +15,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # 1. Install uv (blazing fast backend) and AIMLite framework
-RUN pip install uv aimlite
+RUN pip install --no-cache-dir uv aimlite
 
 # 2. Set project working directory
 WORKDIR /app
@@ -36,7 +37,8 @@ EXPOSE 8000
 
 # 8. Health check verifying inference server status
 HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:8000/health || exit 1
+    CMD curl -f http://localhost:${PORT:-8000}/health || exit 1
 
-# 9. Host multi-model inference server with custom frontend
-CMD ["aimlite", "serve", "--host", "0.0.0.0", "--port", "8000", "--frontend", "frontend"]
+# 9. Host multi-model inference server with custom frontend (dynamically binds to $PORT on cloud hosts)
+CMD ["sh", "-c", "aimlite serve --host 0.0.0.0 --port ${PORT:-8000} --frontend frontend"]
+
